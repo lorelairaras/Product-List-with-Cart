@@ -1,0 +1,15 @@
+{
+  "name": "product-list-with-cart",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.18",
+    "vite": "^7.1.7"
+  }
+}
