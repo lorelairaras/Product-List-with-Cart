@@ -132,6 +132,91 @@ document.addEventListener("DOMContentLoaded", () => {
     resetAddToCartButton(id);
   }
 
+  function updateAddToCartButton(id) {
+    const productCards = document.querySelectorAll(".bg-white.rounded-2xl");
+
+    productCards.forEach((card) => {
+      const productName = card.querySelector("h3").textContent;
+      const productId = productName.toLowerCase().replace(/\s+/g, "-");
+
+      if (productId === id) {
+        const button = card.querySelector(".relative button");
+
+        if (cart[id]) {
+          button.innerHTML = `
+            <div class="flex items-center justify-between w-full px-2">
+              <button class="decrease-quantity border border-rose-300 rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold text-red hover:bg-red hover:text-white">-</button>
+              <span class="font-semibold">${cart[id].quantity}</span>
+              <button class="increase-quantity border border-rose-300 rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold text-red hover:bg-red hover:text-white">+</button>
+            </div>
+          `;
+
+          button.querySelector(".decrease-quantity").addEventListener("click", (e) => {
+            e.stopPropagation();
+            decreaseQuantity(id);
+          });
+
+          button.querySelector(".increase-quantity").addEventListener("click", (e) => {
+            e.stopPropagation();
+            increaseQuantity(id);
+          });
+        }
+      }
+    });
+  }
+
+  function resetAddToCartButton(id) {
+    const productCards = document.querySelectorAll(".bg-white.rounded-2xl");
+
+    productCards.forEach((card) => {
+      const productName = card.querySelector("h3").textContent;
+      const productId = productName.toLowerCase().replace(/\s+/g, "-");
+
+      if (productId === id) {
+        const button = card.querySelector(".relative button");
+        button.innerHTML = `
+          <img src="./assets/images/icon-add-to-cart.svg" alt="Add to cart" class="w-4 h-4" />
+          Add to Cart
+        `;
+        button.addEventListener("click", handleAddToCart);
+      }
+    });
+  }
+
+  function confirmOrder() {
+    if (Object.keys(cart).length === 0) return;
+
+    const modal = document.createElement("div");
+    modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4";
+    modal.innerHTML = `
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+        <img src="./assets/images/icon-order-confirmed.svg" alt="Order confirmed" class="w-16 h-16 mx-auto mb-4" />
+        <h3 class="text-xl font-bold mb-2">Order Confirmed!</h3>
+        <p class="text-rose-500 mb-6">We hope you enjoy your food!</p>
+        <button id="closeModal" class="bg-red text-white py-3 px-8 rounded-xl font-semibold hover:bg-rose-900 transition-colors">
+          Close
+        </button>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById("closeModal").addEventListener("click", () => {
+      document.body.removeChild(modal);
+      cart = {};
+      updateCartDisplay();
+
+      document.querySelectorAll(".bg-white.rounded-2xl").forEach((card) => {
+        const button = card.querySelector(".relative button");
+        button.innerHTML = `
+          <img src="./assets/images/icon-add-to-cart.svg" alt="Add to cart" class="w-4 h-4" />
+          Add to Cart
+        `;
+        button.addEventListener("click", handleAddToCart);
+      });
+    });
+  }
+
   function handleAddToCart(e) {
     const productCard = e.currentTarget.closest(".bg-white.rounded-2xl");
     const productName = productCard.querySelector("h3").textContent;
