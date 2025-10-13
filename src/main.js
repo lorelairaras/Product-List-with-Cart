@@ -34,12 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <h3 class="font-semibold">${item.name}</h3>
               <div class="flex items-center justify-between mt-2">
                 <div class="flex items-center gap-4">
-                  <div class="flex items-center gap-2 bg-rose-50 rounded-lg px-2 py-1">
-                    <button class="quantity-btn decrease text-red font-bold text-lg" data-id="${item.id}">-</button>
-                    <span class="font-semibold mx-2">${item.quantity}</span>
-                    <button class="quantity-btn increase text-red font-bold text-lg" data-id="${item.id}">+</button>
-                  </div>
-                  <span class="text-rose-500 text-sm">@ $${item.price.toFixed(2)}</span>
+                  <span class="text-rose-500 text-sm">${item.quantity}x @ $${item.price.toFixed(2)}</span>
                 </div>
                 <span class="font-semibold">$${itemTotal.toFixed(2)}</span>
               </div>
@@ -70,20 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       cartContainer.innerHTML = cartHTML;
 
-      document.querySelectorAll(".quantity-btn.increase").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          const id = e.target.getAttribute("data-id");
-          increaseQuantity(id);
-        });
-      });
-
-      document.querySelectorAll(".quantity-btn.decrease").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          const id = e.target.getAttribute("data-id");
-          decreaseQuantity(id);
-        });
-      });
-
       document.querySelectorAll(".remove-item").forEach((btn) => {
         btn.addEventListener("click", (e) => {
           const id = e.currentTarget.getAttribute("data-id");
@@ -106,32 +87,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     updateCartDisplay();
     updateAddToCartButton(product.id);
-  }
-
-  function increaseQuantity(id) {
-    if (cart[id]) {
-      cart[id].quantity += 1;
-      updateCartDisplay();
-      updateAddToCartButton(id);
-    }
-  }
-
-  function decreaseQuantity(id) {
-    if (cart[id]) {
-      cart[id].quantity -= 1;
-      if (cart[id].quantity <= 0) {
-        delete cart[id];
-        resetAddToCartButton(id);
-      }
-      updateCartDisplay();
-      updateAddToCartButton(id);
-    }
+    updateProductCardBorder(product.id);
   }
 
   function removeFromCart(id) {
     delete cart[id];
     updateCartDisplay();
     resetAddToCartButton(id);
+    updateProductCardBorder(id);
   }
 
   function updateAddToCartButton(id) {
@@ -144,15 +107,20 @@ document.addEventListener("DOMContentLoaded", () => {
         if (cart[id]) {
           button.innerHTML = `
             <div class="flex items-center justify-between w-full px-1">
-              <button class="decrease-quantity bg-white border border-red rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold text-red hover:bg-red hover:text-white transition-colors">-</button>
-              <span class="font-semibold">${cart[id].quantity}</span>
-              <button class="increase-quantity bg-white border border-red rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold text-red hover:bg-red hover:text-white transition-colors">+</button>
+              <button class="decrease-quantity w-6 h-6 flex items-center justify-center p-0" data-id="${id}">
+                <img src="./assets/images/icon-decrement-quantity.svg" alt="Decrease quantity" class="w-3 h-3" />
+              </button>
+              <span class="font-semibold text-sm mx-1">${cart[id].quantity}</span>
+              <button class="increase-quantity w-6 h-6 flex items-center justify-center p-0" data-id="${id}">
+                <img src="./assets/images/icon-increment-quantity.svg" alt="Increase quantity" class="w-3 h-3" />
+              </button>
             </div>
           `;
 
           button.classList.remove("hover:border-red", "hover:text-red");
           button.classList.add("border-red", "bg-red", "text-white");
 
+          // Add event listeners to the new buttons
           button.querySelector(".decrease-quantity").addEventListener("click", (e) => {
             e.stopPropagation();
             decreaseQuantity(id);
@@ -165,6 +133,28 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
+  }
+
+  function decreaseQuantity(id) {
+    if (cart[id]) {
+      cart[id].quantity -= 1;
+      if (cart[id].quantity <= 0) {
+        delete cart[id];
+        resetAddToCartButton(id);
+        updateProductCardBorder(id);
+      } else {
+        updateAddToCartButton(id);
+      }
+      updateCartDisplay();
+    }
+  }
+
+  function increaseQuantity(id) {
+    if (cart[id]) {
+      cart[id].quantity += 1;
+      updateAddToCartButton(id);
+      updateCartDisplay();
+    }
   }
 
   function resetAddToCartButton(id) {
@@ -181,6 +171,22 @@ document.addEventListener("DOMContentLoaded", () => {
         button.classList.remove("border-red", "bg-red", "text-white");
         button.classList.add("hover:border-red", "hover:text-red");
         button.addEventListener("click", handleAddToCart);
+      }
+    });
+  }
+
+  function updateProductCardBorder(id) {
+    const productCards = document.querySelectorAll(".product-card");
+
+    productCards.forEach((card) => {
+      const cardId = card.getAttribute("data-id");
+
+      if (cart[cardId]) {
+        card.classList.add("border-red");
+        card.classList.remove("border-rose-100");
+      } else {
+        card.classList.remove("border-red");
+        card.classList.add("border-rose-100");
       }
     });
   }
@@ -246,17 +252,18 @@ document.addEventListener("DOMContentLoaded", () => {
       cart = {};
       updateCartDisplay();
 
-      // Reset all add to cart buttons
       document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
         const buttonId = button.getAttribute("data-id");
         resetAddToCartButton(buttonId);
       });
+
+      updateProductCardBorder();
     });
   }
 
   function handleAddToCart(e) {
     const button = e.currentTarget;
-    const productCard = button.closest(".bg-white.rounded-2xl");
+    const productCard = button.closest(".product-card");
     const productName = productCard.querySelector("h3").textContent;
     const productPrice = parseFloat(productCard.querySelector(".text-red").textContent.replace("$", ""));
     const productId = button.getAttribute("data-id");
