@@ -29,20 +29,22 @@ document.addEventListener("DOMContentLoaded", () => {
         totalPrice += itemTotal;
 
         cartHTML += `
-          <div class="flex justify-between items-center">
-            <div>
+          <div class="flex justify-between items-start pb-4 border-b border-rose-100">
+            <div class="flex-1">
               <h3 class="font-semibold">${item.name}</h3>
-              <div class="flex items-center gap-4 mt-1">
-                <div class="flex items-center gap-2">
-                  <button class="quantity-btn decrease text-rose-500 hover:text-red font-bold" data-id="${item.id}">-</button>
-                  <span class="font-semibold">${item.quantity}</span>
-                  <button class="quantity-btn increase text-rose-500 hover:text-red font-bold" data-id="${item.id}">+</button>
+              <div class="flex items-center justify-between mt-2">
+                <div class="flex items-center gap-4">
+                  <div class="flex items-center gap-2 bg-rose-50 rounded-lg px-2 py-1">
+                    <button class="quantity-btn decrease text-red font-bold text-lg" data-id="${item.id}">-</button>
+                    <span class="font-semibold mx-2">${item.quantity}</span>
+                    <button class="quantity-btn increase text-red font-bold text-lg" data-id="${item.id}">+</button>
+                  </div>
+                  <span class="text-rose-500 text-sm">@ $${item.price.toFixed(2)}</span>
                 </div>
-                <span class="text-rose-500">@ $${item.price.toFixed(2)}</span>
                 <span class="font-semibold">$${itemTotal.toFixed(2)}</span>
               </div>
             </div>
-            <button class="remove-item text-rose-400 hover:text-red" data-id="${item.id}">
+            <button class="remove-item text-rose-400 hover:text-red ml-4" data-id="${item.id}">
               <img src="./assets/images/icon-remove-item.svg" alt="Remove item" class="w-4 h-4" />
             </button>
           </div>
@@ -51,13 +53,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       cartHTML += `
         </div>
-        <div class="border-t border-rose-100 mt-4 pt-4">
+        <div class="mt-6">
           <div class="flex justify-between items-center font-semibold">
             <span>Order Total</span>
             <span class="text-lg">$${totalPrice.toFixed(2)}</span>
           </div>
-          <div class="mt-3 bg-rose-50 p-3 rounded-lg text-center text-sm text-rose-500">
-           <img src="./assets/images/icon-carbon-neutral.svg" alt="carbon-neutral" class="w-8 h-8" />
+          <div class="mt-4 bg-rose-50 p-3 rounded-lg flex items-center justify-center gap-2 text-sm text-rose-500">
+            <img src="./assets/images/icon-carbon-neutral.svg" alt="carbon-neutral" class="w-4 h-4" />
             This is a <span class="font-semibold">carbon-neutral</span> delivery
           </div>
           <button id="confirmOrder" class="mt-4 bg-red text-white py-3 w-full rounded-xl font-semibold hover:bg-rose-900 transition-colors">
@@ -133,23 +135,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateAddToCartButton(id) {
-    const productCards = document.querySelectorAll(".bg-white.rounded-2xl");
+    const buttons = document.querySelectorAll(".add-to-cart-btn");
 
-    productCards.forEach((card) => {
-      const productName = card.querySelector("h3").textContent;
-      const productId = productName.toLowerCase().replace(/\s+/g, "-");
+    buttons.forEach((button) => {
+      const buttonId = button.getAttribute("data-id");
 
-      if (productId === id) {
-        const button = card.querySelector(".relative button");
-
+      if (buttonId === id) {
         if (cart[id]) {
           button.innerHTML = `
-            <div class="flex items-center justify-between w-full px-2">
-              <button class="decrease-quantity border border-rose-300 rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold text-red hover:bg-red hover:text-white">-</button>
+            <div class="flex items-center justify-between w-full px-1">
+              <button class="decrease-quantity bg-white border border-red rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold text-red hover:bg-red hover:text-white transition-colors">-</button>
               <span class="font-semibold">${cart[id].quantity}</span>
-              <button class="increase-quantity border border-rose-300 rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold text-red hover:bg-red hover:text-white">+</button>
+              <button class="increase-quantity bg-white border border-red rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold text-red hover:bg-red hover:text-white transition-colors">+</button>
             </div>
           `;
+
+          button.classList.remove("hover:border-red", "hover:text-red");
+          button.classList.add("border-red", "bg-red", "text-white");
 
           button.querySelector(".decrease-quantity").addEventListener("click", (e) => {
             e.stopPropagation();
@@ -166,18 +168,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function resetAddToCartButton(id) {
-    const productCards = document.querySelectorAll(".bg-white.rounded-2xl");
+    const buttons = document.querySelectorAll(".add-to-cart-btn");
 
-    productCards.forEach((card) => {
-      const productName = card.querySelector("h3").textContent;
-      const productId = productName.toLowerCase().replace(/\s+/g, "-");
+    buttons.forEach((button) => {
+      const buttonId = button.getAttribute("data-id");
 
-      if (productId === id) {
-        const button = card.querySelector(".relative button");
+      if (buttonId === id) {
         button.innerHTML = `
           <img src="./assets/images/icon-add-to-cart.svg" alt="Add to cart" class="w-4 h-4" />
           Add to Cart
         `;
+        button.classList.remove("border-red", "bg-red", "text-white");
+        button.classList.add("hover:border-red", "hover:text-red");
         button.addEventListener("click", handleAddToCart);
       }
     });
@@ -186,16 +188,54 @@ document.addEventListener("DOMContentLoaded", () => {
   function confirmOrder() {
     if (Object.keys(cart).length === 0) return;
 
+    const cartItems = Object.values(cart);
+    let totalPrice = 0;
+
+    let orderSummaryHTML = `
+      <div class="mb-6">
+        <h3 class="font-semibold mb-2">Order Summary</h3>
+        <div class="space-y-3">
+    `;
+
+    cartItems.forEach((item) => {
+      const itemTotal = item.price * item.quantity;
+      totalPrice += itemTotal;
+
+      orderSummaryHTML += `
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <span class="font-medium">${item.name}</span>
+            <span class="text-rose-500 text-sm">${item.quantity}x @ $${item.price.toFixed(2)}</span>
+          </div>
+          <span class="font-semibold">$${itemTotal.toFixed(2)}</span>
+        </div>
+      `;
+    });
+
+    orderSummaryHTML += `
+        </div>
+        <div class="flex justify-between items-center mt-4 pt-3 border-t border-rose-100 font-bold">
+          <span>Order Total</span>
+          <span class="text-lg">$${totalPrice.toFixed(2)}</span>
+        </div>
+      </div>
+    `;
+
     const modal = document.createElement("div");
     modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4";
     modal.innerHTML = `
-      <div class="bg-white rounded-2xl p-8 max-w-md w-full text-center">
-        <img src="./assets/images/icon-order-confirmed.svg" alt="Order confirmed" class="w-16 h-16 mx-auto mb-4" />
-        <h3 class="text-xl font-bold mb-2">Order Confirmed!</h3>
-        <p class="text-rose-500 mb-6">We hope you enjoy your food!</p>
-        <button id="closeModal" class="bg-red text-white py-3 px-8 rounded-xl font-semibold hover:bg-rose-900 transition-colors">
-          Close
-        </button>
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full">
+        <div class="flex items-center justify-center mb-4">
+          <img src="./assets/images/icon-order-confirmed.svg" alt="Order confirmed" class="w-16 h-16" />
+        </div>
+        <h3 class="text-xl font-bold text-center mb-2">Order Confirmed</h3>
+        <p class="text-rose-500 text-center mb-6">We hope you enjoy your food!</p>
+        ${orderSummaryHTML}
+        <div class="text-center">
+          <button id="closeModal" class="bg-red text-white py-3 px-8 rounded-xl font-semibold hover:bg-rose-900 transition-colors">
+            Start New Order
+          </button>
+        </div>
       </div>
     `;
 
@@ -206,22 +246,20 @@ document.addEventListener("DOMContentLoaded", () => {
       cart = {};
       updateCartDisplay();
 
-      document.querySelectorAll(".bg-white.rounded-2xl").forEach((card) => {
-        const button = card.querySelector(".relative button");
-        button.innerHTML = `
-          <img src="./assets/images/icon-add-to-cart.svg" alt="Add to cart" class="w-4 h-4" />
-          Add to Cart
-        `;
-        button.addEventListener("click", handleAddToCart);
+      // Reset all add to cart buttons
+      document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
+        const buttonId = button.getAttribute("data-id");
+        resetAddToCartButton(buttonId);
       });
     });
   }
 
   function handleAddToCart(e) {
-    const productCard = e.currentTarget.closest(".bg-white.rounded-2xl");
+    const button = e.currentTarget;
+    const productCard = button.closest(".bg-white.rounded-2xl");
     const productName = productCard.querySelector("h3").textContent;
     const productPrice = parseFloat(productCard.querySelector(".text-red").textContent.replace("$", ""));
-    const productId = productName.toLowerCase().replace(/\s+/g, "-");
+    const productId = button.getAttribute("data-id");
 
     const product = {
       id: productId,
@@ -233,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function initializeAddToCartButtons() {
-    document.querySelectorAll(".relative button").forEach((button) => {
+    document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
       button.removeEventListener("click", handleAddToCart);
       button.addEventListener("click", handleAddToCart);
     });
