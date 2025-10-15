@@ -121,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
           button.classList.remove("hover:border-red", "hover:text-red");
           button.classList.add("border-red", "bg-red", "text-white");
 
-          // Add event listeners to the new buttons
           button.querySelector(".decrease-quantity").addEventListener("click", (e) => {
             e.stopPropagation();
             decreaseQuantity(id);
@@ -192,6 +191,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function getProductImage(productId) {
+    const imageMap = {
+      "waffle-with-berries": "./assets/images/image-waffle-desktop.jpg",
+      "vanilla-bean-creme-brulee": "./assets/images/image-creme-brulee-desktop.jpg",
+      "pistachio-baklava": "./assets/images/image-baklava-desktop.jpg",
+      "macaron-mix-of-five": "./assets/images/image-macaron-desktop.jpg",
+      "red-velvet-cake": "./assets/images/image-cake-desktop.jpg",
+      "salted-caramel-brownie": "./assets/images/image-brownie-desktop.jpg",
+      "classic-tiramisu": "./assets/images/image-tiramisu-desktop.jpg",
+      "lemon-meringue-pie": "./assets/images/image-meringue-desktop.jpg",
+      "vanilla-panna-cotta": "./assets/images/image-panna-cotta-desktop.jpg",
+    };
+
+    return imageMap[productId] || "./assets/images/illustration-empty-cart.svg";
+  }
+
   function confirmOrder() {
     if (Object.keys(cart).length === 0) return;
 
@@ -205,17 +220,23 @@ document.addEventListener("DOMContentLoaded", () => {
     cartItems.forEach((item) => {
       const itemTotal = item.price * item.quantity;
       totalPrice += itemTotal;
+      const productImage = getProductImage(item.id);
 
       orderSummaryHTML += `
         <div class="flex justify-between items-start pb-4 border-b border-rose-100 last:border-b-0">
-          <div class="flex-1">
-            <h3 class="font-semibold text-gray-900 mb-2">${item.name}</h3>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <span class="text-orange-800 text-sm font-semibold">${item.quantity}x</span>
-                <span class="text-rose-400 text-sm">@ $${item.price.toFixed(2)}</span>
+          <div class="flex items-center gap-4">
+            <img src="${productImage}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover" />
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900 mb-1">${item.name}</h3>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <span class="text-orange-800 text-sm font-semibold">${item.quantity}x</span>
+                </div>
+                <div class="flex items-center gap-4">
+                  <span class="text-rose-400 text-sm">@ $${item.price.toFixed(2)}</span>
+                  <span class="font-semibold text-gray-900">$${itemTotal.toFixed(2)}</span>
+                </div>
               </div>
-              <span class="font-semibold text-gray-900">$${itemTotal.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -224,8 +245,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     orderSummaryHTML += `
         </div>
-        <div class="flex justify-between items-center mt-6 pt-4 border-t border-rose-200 ">
-          <span class="text-md text-gray-900">Order Total</span>
+        <div class="flex justify-between items-center mt-6 pt-4 border-t border-rose-200">
+          <span class="text-md text-gray-900 font-bold">Order Total</span>
           <span class="text-lg font-bold text-gray-900">$${totalPrice.toFixed(2)}</span>
         </div>
       </div>
