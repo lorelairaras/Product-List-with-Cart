@@ -29,20 +29,21 @@ document.addEventListener("DOMContentLoaded", () => {
         totalPrice += itemTotal;
 
         cartHTML += `
-          <div class="flex justify-between items-start pb-4 border-b border-rose-100">
-            <div class="flex-1">
-              <h3 class="font-semibold">${item.name}</h3>
-              <div class="flex items-center justify-between mt-2">
-                <div class="flex items-center gap-4">
-                  <span class="text-rose-500 text-sm">${item.quantity}x @ $${item.price.toFixed(2)}</span>
-                </div>
-                <span class="font-semibold">$${itemTotal.toFixed(2)}</span>
+        <div class="flex justify-between items-start pb-4 border-b border-rose-100">
+          <div class="flex-1">
+            <h3 class="font-semibold">${item.name}</h3>
+            <div class="flex items-center justify-between mt-2">
+              <div class="flex items-center gap-4">
+                <span class="text-orange-800 text-sm font-semibold">${item.quantity}x</span>
+                <span class="text-rose-400 text-sm">@ $${item.price.toFixed(2)}</span>
               </div>
+              <span class="font-semibold">$${itemTotal.toFixed(2)}</span>
             </div>
-            <button class="remove-item text-rose-400 hover:text-red ml-4" data-id="${item.id}">
-              <img src="./assets/images/icon-remove-item.svg" alt="Remove item" class="w-4 h-4" />
-            </button>
           </div>
+          <button class="remove-item text-rose-400 hover:text-red ml-4" data-id="${item.id}">
+            <img src="./assets/images/icon-remove-item.svg" alt="Remove item" class="w-4 h-4" />
+          </button>
+        </div>
         `;
       });
 
@@ -196,11 +197,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cartItems = Object.values(cart);
     let totalPrice = 0;
-
     let orderSummaryHTML = `
-      <div class="mb-6">
-        <h3 class="font-semibold mb-2">Order Summary</h3>
-        <div class="space-y-3">
+      <div class="mb-6 bg-rose-50 rounded-xl p-6 border border-rose-50">
+        <div class="space-y-4">
     `;
 
     cartItems.forEach((item) => {
@@ -208,21 +207,26 @@ document.addEventListener("DOMContentLoaded", () => {
       totalPrice += itemTotal;
 
       orderSummaryHTML += `
-        <div class="flex justify-between items-center">
-          <div class="flex items-center gap-2">
-            <span class="font-medium">${item.name}</span>
-            <span class="text-rose-500 text-sm">${item.quantity}x @ $${item.price.toFixed(2)}</span>
+        <div class="flex justify-between items-start pb-4 border-b border-rose-100 last:border-b-0">
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-900 mb-2">${item.name}</h3>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-orange-800 text-sm font-semibold">${item.quantity}x</span>
+                <span class="text-rose-400 text-sm">@ $${item.price.toFixed(2)}</span>
+              </div>
+              <span class="font-semibold text-gray-900">$${itemTotal.toFixed(2)}</span>
+            </div>
           </div>
-          <span class="font-semibold">$${itemTotal.toFixed(2)}</span>
         </div>
       `;
     });
 
     orderSummaryHTML += `
         </div>
-        <div class="flex justify-between items-center mt-4 pt-3 border-t border-rose-100 font-bold">
-          <span>Order Total</span>
-          <span class="text-lg">$${totalPrice.toFixed(2)}</span>
+        <div class="flex justify-between items-center mt-6 pt-4 border-t border-rose-200 ">
+          <span class="text-md text-gray-900">Order Total</span>
+          <span class="text-lg font-bold text-gray-900">$${totalPrice.toFixed(2)}</span>
         </div>
       </div>
     `;
