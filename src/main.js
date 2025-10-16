@@ -223,22 +223,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const productImage = getProductImage(item.id);
 
       orderSummaryHTML += `
-        <div class="flex justify-between items-start pb-4 border-b border-rose-100 last:border-b-0">
-          <div class="flex items-center gap-4">
-            <img src="${productImage}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover" />
-            <div class="flex-1">
-              <h3 class="font-semibold text-gray-900 mb-1">${item.name}</h3>
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                  <span class="text-orange-800 text-sm font-semibold">${item.quantity}x</span>
-                </div>
-                <div class="flex items-center gap-4">
-                  <span class="text-rose-400 text-sm">@ $${item.price.toFixed(2)}</span>
-                  <span class="font-semibold text-gray-900">$${itemTotal.toFixed(2)}</span>
-                </div>
-              </div>
+        <div class="grid grid-cols-[auto_1fr_auto] items-start gap-4 pb-4 border-b border-rose-100 last:border-b-0">
+          <img src="${productImage}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover" />
+          <div class="min-w-0">
+            <h3 class="font-semibold text-gray-900 mb-1 truncate">${item.name}</h3>
+            <div class="flex items-center gap-2">
+              <span class="text-orange-800 text-sm font-semibold">${item.quantity}x</span>
+              <span class="text-rose-400 text-sm">@ $${item.price.toFixed(2)}</span>
             </div>
           </div>
+          <span class="font-semibold text-gray-900 whitespace-nowrap">$${itemTotal.toFixed(2)}</span>
         </div>
       `;
     });
