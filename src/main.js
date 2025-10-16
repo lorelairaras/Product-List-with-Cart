@@ -8,10 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (totalItems === 0) {
       cartContainer.innerHTML = `
-        <h2 class="text-xl font-bold mb-4">Your Cart (0)</h2>
+        <h2 class="text-red text-xl font-bold mb-4">Your Cart (0)</h2>
         <div class="text-center py-8">
-          <div class="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <img src="./assets/images/illustration-empty-cart.svg" alt="Empty cart" class="w-12 h-12" />
+          <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
+            <img src="./assets/images/illustration-empty-cart.svg" alt="Empty cart" />
           </div>
           <p class="text-rose-500">Your added items will appear here</p>
         </div>
